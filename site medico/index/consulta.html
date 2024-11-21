@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marcação de Consulta Médica</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            background-image: url('fundo\ do\ site.jpg');
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        .form-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-container input,
+        .form-container select {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2>Agendamento de Consulta Médica</h2>
+        <form id="form-consulta" onsubmit="marcarConsulta(event)">
+            <label for="nome">Nome do Paciente:</label>
+            <input type="text" id="nome" placeholder="Digite o nome do paciente" required>
+
+            <label for="idade">Idade do Paciente:</label>
+            <input type="number" id="idade" placeholder="Digite a idade do paciente" required min="0">
+
+            <label for="telefone">Telefone para Contato:</label>
+            <input type="tel" id="telefone" placeholder="Digite o telefone para contato" required>
+
+            <label for="especialidade">Especialidade Médica:</label>
+            <select id="especialidade" required>
+                <option value="" disabled selected>Escolha a especialidade</option>
+                <option value="Cardiologia">Cardiologia</option>
+                <option value="Neurologia">Neurologia</option>
+                <option value="Ortopedia">Ortopedia</option>
+                <option value="Pediatria">Pediatria</option>
+                <option value="Oftalmologia">Oftalmologia</option>
+                <option value="Ginecologia">Ginecologia</option>
+            </select>
+
+            <label for="data-consulta">Data da Consulta:</label>
+            <input type="date" id="data-consulta" required>
+
+            <label for="hora-consulta">Hora da Consulta:</label>
+            <input type="time" id="hora-consulta" required>
+
+            <button type="submit">Solicitar Atendimento</button>
+        </form>
+    </div>
+
+    <script>
+        function gerarProtocolo() {
+            // Gerar número de protocolo aleatório de 6 dígitos
+            return Math.floor(100000 + Math.random() * 900000);
+        }
+
+        function marcarConsulta(event) {
+            event.preventDefault();
+
+            const nomePaciente = document.getElementById('nome').value;
+            const idadePaciente = document.getElementById('idade').value;
+            const telefonePaciente = document.getElementById('telefone').value;
+            const especialidade = document.getElementById('especialidade').value;
+            const dataConsulta = document.getElementById('data-consulta').value;
+            const horaConsulta = document.getElementById('hora-consulta').value;
+
+            if (nomePaciente && idadePaciente && telefonePaciente && especialidade && dataConsulta && horaConsulta) {
+                const protocolo = gerarProtocolo();
+
+                alert(`Solicitação de agendamento enviada com sucesso!
+Número do Protocolo: ${protocolo}
+
+Por favor, entre em contato pelo telefone para confirmar o seu agendamento.
+
+Detalhes da Solicitação:
+Nome: ${nomePaciente}
+Idade: ${idadePaciente}
+Especialidade: ${especialidade}
+Data: ${dataConsulta} às ${horaConsulta}`);
+            } else {
+                alert('Preencha todos os campos obrigatórios!');
+            }
+        }
+    </script>
+</body>
+
+</html>

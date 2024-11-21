@@ -1,0 +1,287 @@
+<!--Cadastro de pacientes-->
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Paciente</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            background-image: url('fundo\ do\ site.jpg');
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            margin-bottom: 20px;
+        }
+
+        .form-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-container input {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            margin: 3px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .pacientes-lista {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 600px;
+            margin-top: 20px;
+        }
+
+        .pacientes-lista table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pacientes-lista th, .pacientes-lista td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .pacientes-lista th {
+            background-color: #f2f2f2;
+        }
+
+        .pacientes-lista button {
+            background-color: red;
+            border: none;
+            color: white;
+            padding: 5px 1px;
+            border-radius: 4px;
+            cursor: pointer;
+            
+        }
+
+        .pacientes-lista button:hover {
+            background-color: darkred;
+        }
+
+        .pacientes-lista .edit-button {
+            background-color: #28a745;
+        }
+
+        .pacientes-lista .edit-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2>Cadastro de Paciente</h2>
+        <form id="form-cadastro" onsubmit="cadastrarPaciente(event)">
+            <label for="nome">Nome Completo:</label>
+            <input type="text" id="nome" placeholder="Digite o nome completo" required oninput="capitalizeFirstLetter(this)">
+
+            <label for="cpf">CPF:</label>
+            <input type="text" maxlength="14" id="cpf" placeholder="Digite o CPF" required oninput="formatarCPF(this)">
+
+            <label for="data-nascimento">Data de Nascimento:</label>
+            <input type="date" id="data-nascimento" required>
+
+            <label for="telefone">Telefone:</label>
+            <input type="tel" id="telefone" placeholder="Digite o telefone" required oninput="formatarTelefone(this)">
+
+            <label for="endereco">Endereço:</label>
+            <input type="text" id="endereco" placeholder="Digite o endereço" required>
+
+            <button type="submit">Cadastrar</button>
+            <a href="pagina5.html"><button type="button">Agendar Consulta</button></a>
+        </form>
+    </div>
+
+    <div class="pacientes-lista">
+        <h3>Pacientes Cadastrados</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Telefone</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="lista-pacientes">
+                <!-- Lista de pacientes será gerada aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Função para formatar CPF
+        function formatarCPF(input) {
+            let cpf = input.value.replace(/\D/g, ''); // Remove tudo o que não é número
+            if (cpf.length <= 3) {
+                input.value = cpf;
+            } else if (cpf.length <= 6) {
+                input.value = cpf.replace(/(\d{3})(\d{1,})/, '$1.$2');
+            } else if (cpf.length <= 9) {
+                input.value = cpf.replace(/(\d{3})(\d{3})(\d{1,})/, '$1.$2.$3');
+            } else if (cpf.length <= 11) {
+                input.value = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{1,})/, '$1.$2.$3-$4');
+            }
+        }
+
+        // Função para formatar telefone
+        function formatarTelefone(input) {
+            let telefone = input.value.replace(/\D/g, ''); // Remove tudo o que não é número
+            if (telefone.length <= 2) {
+                input.value = `(${telefone}`;
+            } else if (telefone.length <= 6) {
+                input.value = `(${telefone.slice(0, 2)}) ${telefone.slice(2)}`;
+            } else if (telefone.length <= 10) {
+                input.value = `(${telefone.slice(0, 2)}) ${telefone.slice(2, 7)}-${telefone.slice(7)}`;
+            } else {
+                input.value = `(${telefone.slice(0, 2)}) ${telefone.slice(2, 7)}-${telefone.slice(7, 11)}`;
+            }
+        }
+
+        function capitalizeFirstLetter(input) {
+            let value = input.value;
+            // Capitaliza a primeira letra de cada palavra
+            input.value = value.replace(/\b\w/g, function (char) {
+                return char.toUpperCase();
+            });
+        }
+
+        function getProximoId() {
+            let pacientes = JSON.parse(localStorage.getItem('pacientes')) || [];
+            return pacientes.length ? pacientes[pacientes.length - 1].id + 1 : 1; // Garante que o ID seja único e sequencial
+        }
+
+        function cadastrarPaciente(event) {
+            event.preventDefault();
+            const id = getProximoId(); // Obtem o próximo ID sequencial
+            const nome = document.getElementById('nome').value;
+            const cpf = document.getElementById('cpf').value;
+            const dataNascimento = document.getElementById('data-nascimento').value;
+            const telefone = document.getElementById('telefone').value;
+            const endereco = document.getElementById('endereco').value;
+
+            const paciente = { id, nome, cpf, dataNascimento, telefone, endereco };
+            let pacientes = JSON.parse(localStorage.getItem('pacientes')) || [];
+            pacientes.push(paciente);
+            localStorage.setItem('pacientes', JSON.stringify(pacientes));
+
+            alert(`Paciente cadastrado com sucesso!\nID: ${id}\nNome: ${nome} ANOTE ESSE ID`);
+
+            // Atualiza a lista de pacientes cadastrados
+            exibirPacientes();
+        }
+
+        function exibirPacientes() {
+            const pacientes = JSON.parse(localStorage.getItem('pacientes')) || [];
+            const listaPacientes = document.getElementById('lista-pacientes');
+            listaPacientes.innerHTML = ''; // Limpa a lista
+
+            pacientes.forEach(paciente => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${paciente.id}</td>
+                    <td>${paciente.nome}</td>
+                    <td>${paciente.cpf}</td>
+                    <td>${paciente.telefone}</td>
+                    <td>
+                        <button class="edit-button" onclick="editarPaciente(${paciente.id})">Modificar</button>
+                        <button onclick="excluirPaciente(${paciente.id})">Excluir</button>
+                    </td>
+                `;
+                listaPacientes.appendChild(tr);
+            });
+        }
+
+        function excluirPaciente(id) {
+            let pacientes = JSON.parse(localStorage.getItem('pacientes')) || [];
+            pacientes = pacientes.filter(paciente => paciente.id !== id); // Filtra o paciente com o id correspondente
+            localStorage.setItem('pacientes', JSON.stringify(pacientes));
+
+            alert('Paciente excluído com sucesso!');
+
+            // Atualiza a lista de pacientes
+            exibirPacientes(); // Aqui a função foi chamada novamente para atualizar a lista.
+        }
+
+        function editarPaciente(id) {
+            let pacientes = JSON.parse(localStorage.getItem('pacientes')) || [];
+            const paciente = pacientes.find(p => p.id === id);
+
+            if (paciente) {
+                // Preenche o formulário com os dados do paciente
+                document.getElementById('nome').value = paciente.nome;
+                document.getElementById('cpf').value = paciente.cpf;
+                document.getElementById('data-nascimento').value = paciente.dataNascimento;
+                document.getElementById('telefone').value = paciente.telefone;
+                document.getElementById('endereco').value = paciente.endereco;
+
+                // Modifica a função do botão para editar
+                const form = document.getElementById('form-cadastro');
+                form.onsubmit = function (event) {
+                    event.preventDefault();
+                    // Atualiza os dados do paciente
+                    paciente.nome = document.getElementById('nome').value;
+                    paciente.cpf = document.getElementById('cpf').value;
+                    paciente.dataNascimento = document.getElementById('data-nascimento').value;
+                    paciente.telefone = document.getElementById('telefone').value;
+                    paciente.endereco = document.getElementById('endereco').value;
+
+                    localStorage.setItem('pacientes', JSON.stringify(pacientes));
+
+                    alert('Cadastro atualizado com sucesso!');
+                    exibirPacientes();
+                    form.onsubmit = cadastrarPaciente; // Restaura a função original
+                }
+            }
+        }
+        
+        // Exibe a lista de pacientes ao carregar a página
+        window.onload = exibirPacientes;
+    </script>
+</body>
+
+</html>

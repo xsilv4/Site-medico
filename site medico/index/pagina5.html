@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marcação de Consulta Médica</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 200px;
+            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            background-image: url('fundo\ do\ site.jpg');
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            margin: 200px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            margin-bottom: 20px;
+        }
+
+        .form-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-container input,
+        .form-container select {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            margin: 3px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .historico-consultas {
+            margin-top: 20px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+        }
+
+        .historico-consultas h3 {
+            text-align: center;
+        }
+
+        .consultas-lista {
+            list-style: none;
+            padding: 0;
+        }
+
+        .consultas-lista li {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .consultas-lista span {
+            color: #555;
+        }
+
+        .consultas-lista button {
+            margin-left: 10px;
+            display: flex;
+            padding: 5px 20px;
+            margin-bottom: 5px;
+            background-color: #ffc107;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 80px;
+        }
+
+        .consultas-lista button:hover {
+            background-color: #e0a800;
+        }
+
+        .consultas-lista .btn-delete {
+            background-color: #dc3545;
+            width: 80px;
+        }
+
+        .consultas-lista .btn-delete:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2>Agendamento de Consulta Médica</h2>
+        <form id="form-consulta" onsubmit="marcarConsulta(event)">
+            <label for="id-paciente">ID do Paciente:</label>
+            <input type="number" id="id-paciente" placeholder="Digite o ID do paciente" required>
+
+            <label for="nome">Nome do Paciente:</label>
+            <input type="text" id="nome" placeholder="Nome do paciente" readonly>
+
+            <label for="telefone">Telefone para Contato:</label>
+            <input type="tel" id="telefone" placeholder="Telefone do paciente" readonly>
+
+            <label for="data-nascimento">Data de Nascimento:</label>
+            <input type="date" id="data-nascimento" readonly>
+
+            <!-- Novo campo de especialidade -->
+            <label for="especialidade">Especialidade Médica:</label>
+            <select id="especialidade" required>
+                <option value="" disabled selected>Escolha a especialidade</option>
+                <option value="Cardiologia">Cardiologia</option>
+                <option value="Neurologia">Neurologia</option>
+                <option value="Ortopedia">Ortopedia</option>
+                <option value="Pediatria">Pediatria</option>
+                <option value="Oftalmologia">Oftalmologia</option>
+                <option value="Ginecologia">Ginecologia</option>
+            </select>
+
+            <label for="data-consulta">Data da Consulta:</label>
+            <input type="date" id="data-consulta" required>
+
+            <label for="hora-consulta">Hora da Consulta:</label>
+            <input type="time" id="hora-consulta" required>
+
+            <button type="submit">Marcar Consulta</button>
+            <a href="pagina2.html"><button type="button">Voltar para Tela de Cadastro</button></a>
+        </form>
+    </div>
+
+    <div class="historico-consultas">
+        <h3>Histórico de Consultas</h3>
+        <ul id="consultas-lista" class="consultas-lista">
+            <!-- O histórico de consultas será exibido aqui -->
+        </ul>
+    </div>
+
+    <script>
+        // Função para buscar os dados do paciente no localStorage
+        function buscarDadosPaciente(id) {
+            let pacientes = JSON.parse(localStorage.getItem('pacientes')) || [];
+            return pacientes.find(paciente => paciente.id === id);
+        }
+
+        // Preenche os dados do paciente quando o ID é inserido
+        document.getElementById('id-paciente').addEventListener('change', function () {
+            const id = parseInt(this.value);
+            const paciente = buscarDadosPaciente(id);
+
+            if (paciente) {
+                document.getElementById('nome').value = paciente.nome;
+                document.getElementById('telefone').value = paciente.telefone;
+                document.getElementById('data-nascimento').value = paciente.dataNascimento;
+            } else {
+                document.getElementById('nome').value = '';
+                document.getElementById('telefone').value = '';
+                document.getElementById('data-nascimento').value = '';
+                alert('Paciente não encontrado!');
+            }
+        });
+
+        // Função para marcar a consulta e salvar no histórico
+        function marcarConsulta(event) {
+            event.preventDefault();
+
+            const idPaciente = document.getElementById('id-paciente').value;
+            const nomePaciente = document.getElementById('nome').value;
+            const telefonePaciente = document.getElementById('telefone').value;
+            const especialidade = document.getElementById('especialidade').value;
+            const dataConsulta = document.getElementById('data-consulta').value;
+            const horaConsulta = document.getElementById('hora-consulta').value;
+
+            if (nomePaciente && especialidade && dataConsulta && horaConsulta) {
+                const consulta = {
+                    idPaciente,
+                    nomePaciente,
+                    telefonePaciente,
+                    especialidade,
+                    dataConsulta,
+                    horaConsulta,
+                    dataHora: new Date().toLocaleString() // Data e hora do agendamento
+                };
+
+                // Recupera o histórico de consultas ou cria um novo
+                let historicoConsultas = JSON.parse(localStorage.getItem('historicoConsultas')) || [];
+                historicoConsultas.push(consulta);
+
+                // Salva no localStorage
+                localStorage.setItem('historicoConsultas', JSON.stringify(historicoConsultas));
+
+                alert(`Consulta marcada com sucesso para ${nomePaciente} na especialidade de ${especialidade} no dia ${dataConsulta} às ${horaConsulta}.`);
+
+                // Exibe o histórico de consultas
+                exibirHistoricoConsultas();
+            } else {
+                alert('Preencha todos os campos obrigatórios!');
+            }
+        }
+
+        // Função para exibir o histórico de consultas
+        function exibirHistoricoConsultas() {
+            const consultas = JSON.parse(localStorage.getItem('historicoConsultas')) || [];
+            const listaConsultas = document.getElementById('consultas-lista');
+            listaConsultas.innerHTML = ''; // Limpa a lista atual
+
+            consultas.forEach((consulta, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span><strong>Paciente:</strong> ${consulta.nomePaciente}</span>
+                    <span><strong>Especialidade:</strong> ${consulta.especialidade}</span>
+                    <span><strong>Data da Consulta:</strong> ${consulta.dataConsulta} às ${consulta.horaConsulta}</span>
+                    <div>
+                        <button type="button" onclick="editarConsulta(${index})">Editar</button>
+                        <button type="button" class="btn-delete" onclick="excluirConsulta(${index})">Excluir</button>
+                    </div>
+                `;
+                listaConsultas.appendChild(li);
+            });
+        }
+
+        // Função para editar a consulta
+        function editarConsulta(index) {
+            const consultas = JSON.parse(localStorage.getItem('historicoConsultas')) || [];
+            const consulta = consultas[index];
+
+            document.getElementById('id-paciente').value = consulta.idPaciente;
+            document.getElementById('nome').value = consulta.nomePaciente;
+            document.getElementById('telefone').value = consulta.telefonePaciente;
+            document.getElementById('data-nascimento').value = consulta.dataNascimento;
+            document.getElementById('especialidade').value = consulta.especialidade;
+            document.getElementById('data-consulta').value = consulta.dataConsulta;
+            document.getElementById('hora-consulta').value = consulta.horaConsulta;
+
+            // Remove a consulta do histórico (será salva novamente com a nova data)
+            consultas.splice(index, 1);
+            localStorage.setItem('historicoConsultas', JSON.stringify(consultas));
+
+            // Exibe o histórico atualizado
+            exibirHistoricoConsultas();
+        }
+
+        // Função para excluir a consulta
+        function excluirConsulta(index) {
+            const consultas = JSON.parse(localStorage.getItem('historicoConsultas')) || [];
+            consultas.splice(index, 1);
+
+            // Salva o histórico atualizado no localStorage
+            localStorage.setItem('historicoConsultas', JSON.stringify(consultas));
+
+            // Exibe o histórico atualizado
+            exibirHistoricoConsultas();
+        }
+
+        // Exibe o histórico de consultas ao carregar a página
+        window.onload = exibirHistoricoConsultas;
+    </script>
+</body>
+
+</html>
